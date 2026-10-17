@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#2563eb">
+<title>カウンター</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root { --bg:#f8fafc; --fg:#0f172a; --sub:#64748b; --main:#2563eb; --btn:#e2e8f0; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0f172a; --fg:#f1f5f9; --sub:#94a3b8; --main:#3b82f6; --btn:#1e293b; }
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { margin:0; height:100%; }
+  body {
+    background:var(--bg); color:var(--fg);
+    font-family:system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+    display:flex; flex-direction:column; user-select:none;
+    padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+  }
+  header { display:flex; justify-content:space-between; align-items:center; padding:16px 0; }
+  h1 { font-size:18px; margin:0; color:var(--sub); font-weight:600; }
+  #reset { background:none; border:1px solid var(--sub); color:var(--sub); border-radius:999px; padding:6px 14px; font-size:14px; }
+  #count {
+    flex:1; display:flex; align-items:center; justify-content:center;
+    font-size:min(40vw, 220px); font-weight:700; font-variant-numeric:tabular-nums;
+  }
+  .row { display:flex; gap:12px; padding-bottom:24px; }
+  .row button { border:none; border-radius:24px; font-size:40px; font-weight:700; height:120px; }
+  #minus { flex:1; background:var(--btn); color:var(--fg); }
+  #plus  { flex:2.5; background:var(--main); color:#fff; }
+  .row button:active { transform:scale(.96); }
+</style>
+</head>
+<body>
+  <header>
+    <h1>カウンター</h1>
+    <button id="reset">リセット</button>
+  </header>
+  <div id="count">0</div>
+  <div class="row">
+    <button id="minus" aria-label="1減らす">−</button>
+    <button id="plus" aria-label="1増やす">＋</button>
+  </div>
+<script>
+  const KEY = "counter-value";
+  let n = 0;
+  try { n = parseInt(localStorage.getItem(KEY), 10) || 0; } catch (e) {}
+  const el = document.getElementById("count");
+  function show() {
+    el.textContent = n;
+    try { localStorage.setItem(KEY, n); } catch (e) {}
+  }
+  function buzz() { if (navigator.vibrate) navigator.vibrate(15); }
+  document.getElementById("plus").onclick = () => { n++; buzz(); show(); };
+  document.getElementById("minus").onclick = () => { if (n > 0) { n--; buzz(); show(); } };
+  document.getElementById("reset").onclick = () => { if (confirm("0に戻しますか？")) { n = 0; show(); } };
+  show();
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+</script>
+</body>
+</html>
